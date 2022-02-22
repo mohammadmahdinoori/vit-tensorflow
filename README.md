@@ -250,7 +250,7 @@ window size used for the patch emebdding
 - `heads`: int <br />
 number of heads in the `SRA` mechanism
 - `reductionFactor`: int <br />
-reduction factor used for the down sampling of the `Key` and `Value` in the `SRA` mechanism
+reduction factor used for the down sampling of the `K` and `V` in the `SRA` mechanism
 - `mlp_rate`: int <br />
 expansion rate used in the feed-forward block
 - `layers`: int <br />
