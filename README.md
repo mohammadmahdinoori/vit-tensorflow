@@ -189,3 +189,12 @@ cvtModel.fit(
         validation_data=valData, #The same as training
         epochs=100,)
 ```
+
+<a name="pvt_v1"/>
+
+#  Pyramid Vision Transformer V1 
+
+Pyramid Vision Transformer V1 was introduced in [here](https://arxiv.org/abs/2102.12122). This model stacks multiple Transformer Encoders to form the first convolution-free multi-scale backbone for various visual tasks including Image Segmentation , Object Detection and etc. In addition to this a new attention mechanism called Spatial Reduction Attention (SRA) is also introduced in this paper to reduce the quadratic complexity of the multi-head attention mechansim.
+
+![](https://raw.githubusercontent.com/mohammadmahdinoori/vit-tensorflow/main/images/PvT%20V1.png)
+
