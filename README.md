@@ -1,25 +1,20 @@
 # vit-tensorflow 
-hello
+This repository contains the tensorflow implementation of prominent vision transformers (a category if computer vision models first introduced in [An Image is worth 16 x 16 words](https://arxiv.org/abs/2010.11929)). This repository is inspired from the work of lucidrains which is [vit-pytorch](https://github.com/lucidrains/vit-pytorch). I hope you enjoy these implementations :)
 
 
-# Models 
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
-
-- ###### Vision Transformer (An Image is worth 16 x 16 words)
-- ###### Pyramid Vision Transformer
-- ###### Pyramid Vision Transforemr V2
-- ###### Convolutional Vision Transformer
-- ###### DeiT (Training Data Efficient Image Transforemrs)
+# Models  
+- [Vision Transformer (An Image is worth 16 x 16 words)](#vit)  
+- [Convolutional Vision Transformer](#cvt)
+- [Pyramid Vision Transformer V1](#headers)
+- [Pyramid Vision Transformer V2](#headers)
+- [DeiT (Training Data Efficient Image Transforemrs)](#headers)
 
 # Requirements 
 
 ```bash
 pip install tensorflow
 ```
+<a name="vit"/>
 
 # Vision Transformer 
                 
@@ -56,6 +51,8 @@ trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w ,
 validation_data=valData, #The same as training
 epochs=100,)
 ```
+
+<a name="cvt"/>
 
 #  Convolutional Vision Transformer 
                 
