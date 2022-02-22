@@ -17,7 +17,11 @@ pip install tensorflow
 <a name="vit"/>
 
 # Vision Transformer 
-                
+
+Vision transformer was introduced in [An Image is worth 16 x 16 words](https://arxiv.org/abs/2010.11929). This model usese a Transformer encoder to classify images with pure attention and no convolution.
+
+
+
 ```python
 from vit import ViT
 import tensorflow as tf
