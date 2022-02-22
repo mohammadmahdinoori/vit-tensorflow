@@ -37,9 +37,30 @@ vitClassifier = ViT(
                     heads=2,
                     num_layers=4,
                     mlp_rate=2,
-                    dropout_rate=0.1
+                    dropout_rate=0.1,
+                    prediction_dropout=0.3,
 )
 ```
+
+##### Params
+- `num_classes`: int <br />
+number of classes used for the final classification head
+- `patch_size`: int <br />
+patch_size used for the tokenization
+- `num_of_patches`: int <br />
+number of patches after the tokenization which is used for the positional encoding, Generally it can be computed by the following formula `(((h-patch_size)//patch_size) + 1)*(((w-patch_size)//patch_size) + 1)` where `h` is the height of the image and `w` is the width of the image. In addition, when height and width of the image are devisable by the `patch_size` the following formula can be used as well `(h//patch_size)*(w//patch_size)`
+- `d_model`: int <br />
+hidden dimension of the transformer encoder and the demnesion used for patch embedding
+- `heads`: int <br />
+number of heads used for the multi-head attention mechanism
+- `num_layers`: int <br />
+number of blocks in encoder transformer
+- `mlp_rate`: int <br />
+the rate of expansion in the feed-forward block of each transformer block (the dimension after expansion is `mlp_rate * d_model`)
+- `dropout_rate`: int <br />
+dropout rate used in the multi-head attention mechanism
+- `prediction_dropout`: int <br />
+dropout rate used in the final prediction head of the model
 
 #### Inference
 
