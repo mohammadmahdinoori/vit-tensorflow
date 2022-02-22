@@ -244,7 +244,7 @@ dropout rate used for the prediction head
 
 ##### PVTStage Params
 - `d_model`: int <br />
-dimension used for the `SRA` mechanism and the patch embedding embedding
+dimension used for the `SRA` mechanism and the patch embedding
 - `patch_size`: tuple(int , int) <br />
 window size used for the patch emebdding
 - `heads`: int <br />
