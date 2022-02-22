@@ -287,7 +287,7 @@ pvtModel.fit(
 
 #  Pyramid Vision Transformer V2
 
-Pyramid Vision Transformer V2 was introduced in [here](https://arxiv.org/abs/2106.13797). This model is an improved version of the PVT V1 which has three improvements: <br />
+Pyramid Vision Transformer V2 was introduced in [here](https://arxiv.org/abs/2106.13797). This model is an improved version of the PVT V1. The improvements of this version are as follows: <br />
 1) It uses overlapping patch embedding by using padded convolutions
 2) It uses convolutional feed-forward blocks which have a depth-wise convolution after the first fully-connected layer
 3) It uses a fixed pooling instead of convolutions for down sampling the K and V in the SRA attention mechanism (The new attention mechanism is called Linear SRA)
