@@ -6,7 +6,7 @@ This repository contains the tensorflow implementation of the state-of-the-art v
 - [Vision Transformer (An Image is worth 16 x 16 words)](#vit)  
 - [Convolutional Vision Transformer](#cvt)
 - [Pyramid Vision Transformer V1](#pvt_v1)
-- [Pyramid Vision Transformer V2](#headers)
+- [Pyramid Vision Transformer V2](#pvt_v2)
 - [DeiT (Training Data Efficient Image Transforemrs)](#headers)
 
 # Requirements 
@@ -282,3 +282,105 @@ pvtModel.fit(
         validation_data=valData, #The same as training
         epochs=100,)
 ```
+
+<a name="pvt_v2"/>
+
+#  Pyramid Vision Transformer V2
+
+Pyramid Vision Transformer V2 was introduced in [here](https://arxiv.org/abs/2106.13797). This model is an improved version of the PVT V1 which has three improvements: <br />
+1) It uses overlapping patch embedding by using padded convolutions
+2) It uses convolutional feed-forward blocks which have a depth-wise convolution after the first fully-connected layer
+3) It uses a fixed pooling instead of convolutions for down sampling the K and V in the SRA attention mechanism (The new attention mechanism is called Linear SRA)
+
+![](https://raw.githubusercontent.com/mohammadmahdinoori/vit-tensorflow/main/images/PvT%20V2.png)
+
+### Usage
+
+#### Defining the Model
+
+```python
+from pvt_v2 import PVTV2 , PVTV2Stage
+import tensorflow as tf
+
+pvtV2Model = PVTV2(
+num_of_classes=1000, 
+stages=[
+        PVTV2Stage(d_model=64,
+                   windowSize=(2 , 2), 
+                   heads=1,
+                   poolingSize=(7 , 7), 
+                   mlp_rate=2, 
+                   mlp_windowSize=(3 , 3), 
+                   layers=2, 
+                   dropout_rate=0.1),
+        PVTV2Stage(d_model=128, 
+                   windowSize=(2 , 2),
+                   heads=2,
+                   poolingSize=(7 , 7), 
+                   mlp_rate=2, 
+                   mlp_windowSize=(3 , 3), 
+                   layers=2,
+                   dropout_rate=0.1),
+        PVTV2Stage(d_model=320,
+                   windowSize=(2 , 2), 
+                   heads=5, 
+                   poolingSize=(7 , 7), 
+                   mlp_rate=2, 
+                   mlp_windowSize=(3 , 3), 
+                   layers=2, 
+                   dropout_rate=0.1),
+],
+dropout=0.5)
+```
+
+##### PVT Params
+- `num_of_classes`: int <br />
+number of classes used in the final prediction layer
+- `stages`: list of PVTV2Stage <br />
+list of pvt v2 stages
+- `dropout`: float <br />
+dropout rate used for the prediction head
+
+##### PVTStage Params
+- `d_model`: int <br />
+dimension used for the `Linear SRA` mechanism and the convolutional patch embedding
+- `windowSize`: tuple(int , int) <br />
+window size used for the convolutional patch emebdding
+- `heads`: int <br />
+number of heads in the `Linear SRA` mechanism
+- `poolingSize`: tuple(int , int) <br />
+size of the K and V after the fixed pooling
+- `mlp_rate`: int <br />
+expansion rate used in the convolutional feed-forward block
+- `mlp_windowSize`: tuple(int , int) <br />
+the window size used for the depth-wise convolution in the convolutional feed-forward block
+- `layers`: int <br />
+number of transformer encoders
+- `dropout_rate`: float <br />
+dropout rate used in each transformer encoder
+
+#### Inference
+
+```python
+sampleInput = tf.random.normal(shape=(1 , 224 , 224 , 3))
+output = pvtV2Model(sampleInput , training=False)
+print(output.shape) # (1 , 1000)
+```
+
+#### Training
+
+```python
+pvtV2Model.compile(
+          loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+          optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+          metrics=[
+                   tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
+                   tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5 , name="top_5_accuracy"),
+          ])
+
+pvtV2Model.fit(
+          trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
+          validation_data=valData, #The same as training
+          epochs=100,)
+```
+
