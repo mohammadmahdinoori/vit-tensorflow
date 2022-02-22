@@ -5,7 +5,7 @@ This repository contains the tensorflow implementation of the state-of-the-art v
 # Models  
 - [Vision Transformer (An Image is worth 16 x 16 words)](#vit)  
 - [Convolutional Vision Transformer](#cvt)
-- [Pyramid Vision Transformer V1](#headers)
+- [Pyramid Vision Transformer V1](#pvt_v1)
 - [Pyramid Vision Transformer V2](#headers)
 - [DeiT (Training Data Efficient Image Transforemrs)](#headers)
 
@@ -139,7 +139,7 @@ dropout=0.5)
 
 ##### CvT Params
 - `num_of_classes`: int <br />
-number of classes for the final prediction layer
+number of classes used in the final prediction layer
 - `stages`: list of CvTStage <br />
 list of cvt stages
 - `dropout`: float <br />
@@ -198,3 +198,87 @@ Pyramid Vision Transformer V1 was introduced in [here](https://arxiv.org/abs/210
 
 ![](https://raw.githubusercontent.com/mohammadmahdinoori/vit-tensorflow/main/images/PvT%20V1.png)
 
+### Usage
+
+#### Defining the Model
+
+```python
+from pvt_v1 import PVT , PVTStage
+import tensorflow as tf
+
+pvtModel = PVT(
+num_of_classes=1000, 
+stages=[
+        PVTStage(d_model=64,
+                 patch_size=(2 , 2),
+                 heads=1,
+                 reductionFactor=2,
+                 mlp_rate=2,
+                 layers=2, 
+                 dropout_rate=0.1),
+        PVTStage(d_model=128,
+                 patch_size=(2 , 2),
+                 heads=2, 
+                 reductionFactor=2, 
+                 mlp_rate=2, 
+                 layers=2, 
+                 dropout_rate=0.1),
+        PVTStage(d_model=320,
+                 patch_size=(2 , 2),
+                 heads=5, 
+                 reductionFactor=2, 
+                 mlp_rate=2, 
+                 layers=2, 
+                 dropout_rate=0.1),
+],
+dropout=0.5)
+```
+
+##### PVT Params
+- `num_of_classes`: int <br />
+number of classes used in the final prediction layer
+- `stages`: list of PVTStage <br />
+list of pvt stages
+- `dropout`: float <br />
+dropout rate used for the prediction head
+
+##### PVTStage Params
+- `d_model`: int <br />
+dimension used for the `SRA` mechanism and the patch embedding embedding
+- `patch_size`: tuple(int , int) <br />
+window size used for the patch emebdding
+- `heads`: int <br />
+number of heads in the `SRA` mechanism
+- `reductionFactor`: int <br />
+reduction factor used for the down sampling of the `Key` and `Value` in the `SRA` mechanism
+- `mlp_rate`: int <br />
+expansion rate used in the feed-forward block
+- `layers`: int <br />
+number of transformer encoders
+- `dropout_rate`: float <br />
+dropout rate used in each transformer encoder
+
+#### Inference
+
+```python
+sampleInput = tf.random.normal(shape=(1 , 224 , 224 , 3))
+output = pvtModel(sampleInput , training=False)
+print(output.shape) # (1 , 1000)
+```
+
+#### Training
+
+```python
+pvtModel.compile(
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        metrics=[
+                 tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
+                 tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5 , name="top_5_accuracy"),
+        ])
+
+pvtModel.fit(
+        trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
+        validation_data=valData, #The same as training
+        epochs=100,)
+```
