@@ -3,11 +3,11 @@ This repository contains the tensorflow implementation of the state-of-the-art v
 
 
 # Models  
-- [Vision Transformer (An Image is worth 16 x 16 words)](#vit)  
+- [Vision Transformer: An Image is worth 16 x 16 words](#vit)  
 - [Convolutional Vision Transformer](#cvt)
 - [Pyramid Vision Transformer V1](#pvt_v1)
 - [Pyramid Vision Transformer V2](#pvt_v2)
-- [DeiT (Training Data Efficient Image Transforemrs)](#headers)
+- [DeiT: Training Data Efficient Image Transforemrs & Distillation Through Attention](#deit)
 
 # Requirements 
 
@@ -382,5 +382,94 @@ pvtV2Model.fit(
           trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
           validation_data=valData, #The same as training
           epochs=100,)
+```
+
+<a name="deit"/>
+
+# DeiT
+
+DeiT was introduced in [Training Data-Efficient Image Transformers & Distillation Through Attention](https://arxiv.org/pdf/2012.12877). Since original vision transformer is data hungry due to the lack of existance of any inductive bias (unlike CNNs) a lot of data is required to train original vision transformer in order to surpass the state-of-the-art CNNs such as Resnet. Therefore, in this paper authors used a pre-trained CNN such as resent during training and used a sepcial loss function to perform distillation through attention.
+
+![](https://raw.githubusercontent.com/mohammadmahdinoori/vit-tensorflow/main/images/DeiT.png)
+
+### Usage
+
+#### Defining the Model
+```python
+from deit import DeiT
+import tensorflow as tf
+
+teacherModel = tf.keras.applications.ResNet50(include_top=True, 
+                                              weights="imagenet", 
+                                              input_shape=(224 , 224 , 3))
+
+deitModel = DeiT(
+                 num_classes=1000,
+                 patch_size=16,
+                 num_of_patches=(224//16)**2,
+                 d_model=128,
+                 heads=2,
+                 num_layers=4,
+                 mlp_rate=2,
+                 teacherModel=teacherModel,
+                 temperature=1.0, 
+                 alpha=0.5,
+                 hard=False, 
+                 dropout_rate=0.1,
+                 prediction_dropout=0.3,
+)
+```
+
+##### Params
+- `num_classes`: int <br />
+number of classes used for the final classification head
+- `patch_size`: int <br />
+patch_size used for the tokenization
+- `num_of_patches`: int <br />
+number of patches after the tokenization which is used for the positional encoding, Generally it can be computed by the following formula `(((h-patch_size)//patch_size) + 1)*(((w-patch_size)//patch_size) + 1)` where `h` is the height of the image and `w` is the width of the image. In addition, when height and width of the image are devisable by the `patch_size` the following formula can be used as well `(h//patch_size)*(w//patch_size)`
+- `d_model`: int <br />
+hidden dimension of the transformer encoder and the demnesion used for patch embedding
+- `heads`: int <br />
+number of heads used for the multi-head attention mechanism
+- `num_layers`: int <br />
+number of blocks in encoder transformer
+- `mlp_rate`: int <br />
+the rate of expansion in the feed-forward block of each transformer block (the dimension after expansion is `mlp_rate * d_model`)
+- `teacherModel`: Tensorflow Model <br />
+the teacherModel used for the distillation during training, This model is a pre-trained CNN model with the same input_shape and output_shape as the Transformer
+- `temperature`: float <br />
+the temperature parameter in the loss
+- `alpha`: float <br />
+the coefficient balancing the Kullback–Leibler divergence loss (KL) and the cross-entropy loss
+- `hard`: bool <br />
+indicates using Hard-label distillation or Soft distillation
+- `dropout_rate`: float <br />
+dropout rate used in the multi-head attention mechanism
+- `prediction_dropout`: float <br />
+dropout rate used in the final prediction head of the model
+
+#### Inference
+
+```python
+sampleInput = tf.random.normal(shape=(1 , 224 , 224 , 3))
+output = deitModel(sampleInput , training=False)
+print(output.shape) # (1 , 1000)
+```
+
+#### Training
+
+```python
+#Note that the loss is defined inside the model and no loss should be passed here
+deitModel.compile(
+         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+         metrics=[
+                  tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
+                  tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5 , name="top_5_accuracy"),
+         ])
+
+deitModel.fit(
+         trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b , num_classes))
+         validation_data=valData, #The same as training
+         epochs=100,)
 ```
 
