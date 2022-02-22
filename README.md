@@ -1,4 +1,4 @@
-# vit-tensorflow 
+# ViT Tensorflow
 This repository contains the tensorflow implementation of the state-of-the-art vision transformers (a category if computer vision models first introduced in [An Image is worth 16 x 16 words](https://arxiv.org/abs/2010.11929)). This repository is inspired from the work of lucidrains which is [vit-pytorch](https://github.com/lucidrains/vit-pytorch). I hope you enjoy these implementations :)
 
 
@@ -20,8 +20,11 @@ pip install tensorflow
 
 Vision transformer was introduced in [An Image is worth 16 x 16 words](https://arxiv.org/abs/2010.11929). This model usese a Transformer encoder to classify images with pure attention and no convolution.
 
+![](https://github.com/mohammadmahdinoori/vit-tensorflow/blob/main/images/ViT.png?raw=true)
 
+### Usage
 
+#### Defining the Model
 ```python
 from vit import ViT
 import tensorflow as tf
@@ -36,14 +39,21 @@ vitClassifier = ViT(
                     mlp_rate=2,
                     dropout_rate=0.1
 )
+```
 
-#inference
+#### Inference
+
+```python
 sampleInput = tf.random.normal(shape=(1 , 224 , 224 , 3))
 output = vitClassifier(sampleInput , training=False)
 print(output.shape) # (1 , 1000)
+```
 
-#training
-vitClassifier.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+#### Training
+
+```python
+vitClassifier.compile(
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
               optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
               metrics=[
                        tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
@@ -51,9 +61,9 @@ vitClassifier.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(),
               ])
 
 vitClassifier.fit(
-trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
-validation_data=valData, #The same as training
-epochs=100,)
+              trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
+              validation_data=valData, #The same as training
+              epochs=100,)
 ```
 
 <a name="cvt"/>
