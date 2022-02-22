@@ -1,5 +1,5 @@
 # vit-tensorflow 
-This repository contains the tensorflow implementation of prominent vision transformers (a category if computer vision models first introduced in [An Image is worth 16 x 16 words](https://arxiv.org/abs/2010.11929)). This repository is inspired from the work of lucidrains which is [vit-pytorch](https://github.com/lucidrains/vit-pytorch). I hope you enjoy these implementations :)
+This repository contains the tensorflow implementation of the state-of-the-art vision transformers (a category if computer vision models first introduced in [An Image is worth 16 x 16 words](https://arxiv.org/abs/2010.11929)). This repository is inspired from the work of lucidrains which is [vit-pytorch](https://github.com/lucidrains/vit-pytorch). I hope you enjoy these implementations :)
 
 
 # Models  
