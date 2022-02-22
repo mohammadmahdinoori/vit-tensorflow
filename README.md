@@ -90,7 +90,14 @@ vitClassifier.fit(
 <a name="cvt"/>
 
 #  Convolutional Vision Transformer 
-                
+
+Convolutional Vision Transformer was introduced in [here](https://arxiv.org/abs/2103.15808). This model uses a hierarchical (multi-stage) architecture with convolutional embeddings in the begining of each stage. it also uses Convolutional Transformer Blocks to improve the orginal vision transformer by adding CNNs inductive bias into the architecture.
+
+
+### Usage
+
+#### Defining the Model
+
 ```python
 from cvt import CvT , CvTStage
 import tensorflow as tf
@@ -121,22 +128,29 @@ cvtModel = CvT(1000 , [
                                projectionStrides=(2 , 2), 
                                ffnRate=4)
 ])
+```
 
-#inference
+#### Inference
+
+```python
 sampleInput = tf.random.normal(shape=(1 , 224 , 224 , 3))
 output = cvtModel(sampleInput , training=False)
 print(output.shape) # (1 , 1000)
+```
 
-#training
-cvtModel.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-              optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-              metrics=[
-                       tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
-                       tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5 , name="top_5_accuracy"),
-              			 ])
+#### Training
+
+```python
+cvtModel.compile(
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        metrics=[
+                 tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
+                 tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5 , name="top_5_accuracy"),
+        ])
 
 cvtModel.fit(
-trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
-validation_data=valData, #The same as training
-epochs=100,)
+        trainingData, #Tensorflow dataset of images and labels in shape of ((b , h , w , 3) , (b,))
+        validation_data=valData, #The same as training
+        epochs=100,)
 ```
