@@ -57,9 +57,9 @@ number of heads used for the multi-head attention mechanism
 number of blocks in encoder transformer
 - `mlp_rate`: int <br />
 the rate of expansion in the feed-forward block of each transformer block (the dimension after expansion is `mlp_rate * d_model`)
-- `dropout_rate`: int <br />
+- `dropout_rate`: float <br />
 dropout rate used in the multi-head attention mechanism
-- `prediction_dropout`: int <br />
+- `prediction_dropout`: float <br />
 dropout rate used in the final prediction head of the model
 
 #### Inference
@@ -93,6 +93,7 @@ vitClassifier.fit(
 
 Convolutional Vision Transformer was introduced in [here](https://arxiv.org/abs/2103.15808). This model uses a hierarchical (multi-stage) architecture with convolutional embeddings in the begining of each stage. it also uses Convolutional Transformer Blocks to improve the orginal vision transformer by adding CNNs inductive bias into the architecture.
 
+![](https://raw.githubusercontent.com/mohammadmahdinoori/vit-tensorflow/main/images/CvT.png)
 
 ### Usage
 
@@ -102,33 +103,67 @@ Convolutional Vision Transformer was introduced in [here](https://arxiv.org/abs/
 from cvt import CvT , CvTStage
 import tensorflow as tf
 
-cvtModel = CvT(1000 , [
-                      CvTStage(projectionDim=64, 
-                               heads=1, 
-                               embeddingWindowSize=(7 , 7), 
-                               embeddingStrides=(4 , 4), 
-                               layers=1,
-                               projectionWindowSize=(3 , 3), 
-                               projectionStrides=(2 , 2), 
-                               ffnRate=4),
-                      CvTStage(projectionDim=192,
-                               heads=3,
-                               embeddingWindowSize=(3 , 3), 
-                               embeddingStrides=(2 , 2),
-                               layers=1, 
-                               projectionWindowSize=(3 , 3), 
-                               projectionStrides=(2 , 2), 
-                               ffnRate=4),
-                      CvTStage(projectionDim=384,
-                               heads=6,
-                               embeddingWindowSize=(3 , 3),
-                               embeddingStrides=(2 , 2),
-                               layers=1,
-                               projectionWindowSize=(3 , 3),
-                               projectionStrides=(2 , 2), 
-                               ffnRate=4)
-])
+cvtModel = CvT(
+num_of_classes=1000, 
+stages=[
+        CvTStage(projectionDim=64, 
+                 heads=1, 
+                 embeddingWindowSize=(7 , 7), 
+                 embeddingStrides=(4 , 4), 
+                 layers=1,
+                 projectionWindowSize=(3 , 3), 
+                 projectionStrides=(2 , 2), 
+                 ffnRate=4,
+                 dropoutRate=0.1),
+        CvTStage(projectionDim=192,
+                 heads=3,
+                 embeddingWindowSize=(3 , 3), 
+                 embeddingStrides=(2 , 2),
+                 layers=1, 
+                 projectionWindowSize=(3 , 3), 
+                 projectionStrides=(2 , 2), 
+                 ffnRate=4,
+                 dropoutRate=0.1),
+        CvTStage(projectionDim=384,
+                 heads=6,
+                 embeddingWindowSize=(3 , 3),
+                 embeddingStrides=(2 , 2),
+                 layers=1,
+                 projectionWindowSize=(3 , 3),
+                 projectionStrides=(2 , 2), 
+                 ffnRate=4,
+                 dropoutRate=0.1)
+],
+dropout=0.5)
 ```
+
+##### CvT Params
+- `num_of_classes`: int <br />
+number of classes for the final prediction layer
+- `stages`: list of CvTStage <br />
+list of cvt stages
+- `dropout`: float <br />
+dropout rate used for the prediction head
+
+##### CvTStage Params
+- `projectionDim`: int <br />
+dimension used for the multi-head attention mechanism and the convolutional embedding
+- `heads`: int <br />
+number of heads in the multi-head attention mechanism
+- `embeddingWindowSize`: tuple(int , int) <br />
+window size used for the convolutional emebdding
+- `embeddingStrides`: tuple(int , int) <br />
+strides used for the convolutional embedding
+- `layers`: int <br />
+number of convolutional transformer blocks
+- `projectionWindowSize`: tuple(int , int) <br />
+window size used for the convolutional projection in each convolutional transformer block
+- `projectionStrides`: tuple(int , int) <br />
+strides used for the convolutional projection in each convolutional transformer block
+- `ffnRate`: int <br />
+expansion rate of the mlp block in each convolutional transformer block
+- `dropoutRate`: float <br />
+dropout rate used in each convolutional transformer block
 
 #### Inference
 
